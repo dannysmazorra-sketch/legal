@@ -16,3 +16,6 @@
 <p><a href="privacidad.html">Política de Privacidad</a> · <a href="terminos.html">Términos de Servicio</a></p>
 </body>
 </html>
+app.get('/bienvenida', (_req, res) => {
+  res.sendFile(__dirname + '/bienvenida.html');
+});
