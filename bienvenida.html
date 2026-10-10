@@ -1,47 +1,126 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenido a Imagux</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background-color: #eaf4fb;
-            font-family: 'Nunito', sans-serif;
-            margin: 0;
+/* Tarjeta de Paso */
+        .step-card {
+            background: #ffffff;
+            border: 1px solid #e1eef9;
+            border-radius: 16px;
             padding: 20px;
             display: flex;
-            justify-content: center;
-        }
-        .container {
-            background-color: #ffffff;
-            max-width: 650px;
-            width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            overflow: hidden;
-            position: relative;
-        }
-        .header {
-            text-align: center;
-            padding: 30px 20px 10px;
-        }
-        .header h2 {
-            color: #0099ff;
-            margin: 0;
-            font-size: 28px;
-            font-weight: 800;
-        }
-        .header span {
-            font-size: 10px;
-            color: #ffa500;
-            font-weight: bold;
-        }
-        .hero {
-            display: flex;
-            padding: 20px 30px;
             align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 43, 92, 0.03);
+            gap: 20px;
         }
-        .hero-text {
-            flex:
+        .step-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            flex: 1;
+        }
+        .step-icon-bg {
+            width: 44px;
+            height: 44px;
+            background: #e8f4fc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0099ff;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .step-title {
+            color: #002b5c;
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+        .step-title span {
+            color: #ffb703;
+            margin-right: 4px;
+        }
+        .step-desc {
+            color: #5a6e85;
+            font-size: 12.5px;
+            line-height: 1.4;
+        }
+
+        /* Botón QR (Paso 1) */
+        .btn-qr-box {
+            border: 2px dashed #0099ff;
+            background: #f4f9fe;
+            border-radius: 12px;
+            padding: 12px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 170px;
+            transition: all 0.2s ease;
+        }
+        .btn-qr-box:hover {
+            background: #e8f4fc;
+            transform: translateY(-2px);
+        }
+        .qr-icon {
+            color: #0099ff;
+            font-size: 26px;
+            margin-bottom: 4px;
+        }
+        .qr-text-main {
+            color: #002b5c;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+        .qr-text-sub {
+            color: #0099ff;
+            font-size: 9px;
+            margin-top: 2px;
+        }
+
+        /* Botón Azul (Paso 2) */
+        .btn-action-blue {
+            background: #0099ff;
+            color: #ffffff !important;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 12px;
+            padding: 12px 22px;
+            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 153, 255, 0.3);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+        .btn-action-blue:hover {
+            background: #0080d7;
+            transform: translateY(-2px);
+        }
+
+        /* Caja de Agradecimiento */
+        .thank-box {
+            background: #f4f9fe;
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .thank-icon {
+            width: 36px;
+            height: 36px;
+            background: #ffb703;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .thank-text h4 {
+            color: #002b5c;
