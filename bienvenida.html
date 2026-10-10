@@ -81,7 +81,145 @@
     display:inline-flex;align-items:center;gap:10px;margin-top:16px;
     background:linear-gradient(180deg,#14a0e6,#0888d4);color:#fff;text-decoration:none;
     font-weight:700;font-size:14.5px;letter-spacing:.8px;text-transform:uppercase;
-    p<p>Escanea el código QR personalizado para vincular la cuenta de WhatsApp que utilizará tu secretario inteligente.</p>
+    padding:15px 62px;border-radius:30px;box-shadow:0 8px 18px rgba(8,136,212,.35);
+    transition:transform .15s,box-shadow .15s;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(8,136,212,.45)}
+
+  .qr-box{
+    flex-shrink:0;width:200px;border:2px dashed #52b6ec;border-radius:12px;
+    padding:18px 12px;text-align:center;text-decoration:none;color:var(--navy);
+    background:#f7fbff;transition:background .15s,transform .15s;display:block;
+  }
+  .qr-box:hover{background:#e9f5fd;transform:translateY(-2px)}
+  .qr-box svg{width:82px;height:82px}
+  .qr-box strong{display:block;font-size:13px;margin-top:10px;font-weight:800;letter-spacing:.3px}
+  .qr-box small{display:block;font-size:11px;margin-top:3px;color:var(--text)}
+  .qr-box .qr-btn{
+    display:inline-block;margin-top:10px;background:var(--blue);color:#fff;font-size:12px;font-weight:700;
+    padding:8px 16px;border-radius:20px;letter-spacing:.5px;
+  }
+
+  /* Thanks */
+  .thanks{
+    margin:18px 32px 24px;background:linear-gradient(90deg,#eaf4fc,#f4f9fe);border-radius:16px;
+    padding:22px 26px;display:flex;align-items:center;gap:22px;position:relative;
+  }
+  .heart{
+    width:62px;height:62px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .heart svg{width:30px;height:30px}
+  .thanks-text{border-left:2px solid #d3e7f7;padding-left:20px}
+  .thanks-text strong{display:block;color:var(--navy);font-size:17px;margin-bottom:4px}
+  .thanks-text span{font-size:15px;line-height:1.5}
+  .sparks{margin-left:auto;width:60px}
+
+  /* Footer */
+  .footer{
+    background:linear-gradient(135deg,#102c55,#1a4378);color:#fff;text-align:center;
+    padding:28px 20px 30px;position:relative;overflow:hidden;
+  }
+  .footer .brand{display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap}
+  .footer .brand .n{font-size:34px;font-weight:400;color:#5fc3f5;letter-spacing:1px}
+  .footer .brand .sep{width:1px;height:22px;background:#5fc3f5}
+  .footer .brand .t{font-size:13px;font-weight:700;color:var(--orange)}
+  .contact{display:flex;justify-content:center;align-items:center;gap:26px;margin-top:18px;flex-wrap:wrap;font-size:14.5px}
+  .contact a{color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:10px}
+  .contact a:hover{text-decoration:underline}
+  .contact svg{width:22px;height:22px}
+  .contact .vsep{width:1px;height:24px;background:#3b6aa3}
+  .bars{margin-top:18px;display:flex;justify-content:center;gap:10px}
+  .bars i{display:block;width:50px;height:3px;border-radius:2px;background:var(--blue)}
+  .bars i+i{background:var(--orange)}
+  .footer .fc1{position:absolute;left:0;bottom:0;width:100px}
+  .footer .fc2{position:absolute;right:0;bottom:0;width:150px}
+
+  /* Responsive */
+  @media (max-width:680px){
+    body{padding:14px 8px}
+    .intro{flex-direction:column;padding:26px 24px 10px;text-align:left}
+    .intro h1{font-size:32px}
+    .robot{width:170px;align-self:center}
+    .steps{padding:10px 14px}
+    .step{flex-direction:column;align-items:flex-start;padding:22px 20px}
+    .step-body{border-left:none;padding-left:0;width:100%}
+    .qr-box{width:100%}
+    .btn{padding:15px 30px;width:100%;justify-content:center}
+    .thanks{margin:16px 14px 20px;flex-wrap:wrap}
+    .sparks{display:none}
+    .contact .vsep{display:none}
+    .logo .name{font-size:44px}
+  }
+</style>
+</head>
+<body>
+<main class="card">
+
+  <!-- HEADER -->
+  <header class="header">
+    <svg class="corner" viewBox="0 0 170 90" preserveAspectRatio="none"><path d="M0 0H165C130 60 70 85 0 88Z" fill="#0a8fd8"/><path d="M165 0C150 40 100 75 40 85C90 72 135 40 150 0Z" fill="#f7a823"/></svg>
+    <div class="pill"></div>
+    <div class="logo">
+      <!-- Para usar tu logo real: reemplaza este <svg> por <img src="logo.png" alt="Imagux" width="84"> -->
+      <svg viewBox="0 0 90 90" fill="none">
+        <circle cx="45" cy="38" r="26" stroke="#f7a823" stroke-width="5" stroke-dasharray="120 30" stroke-linecap="round"/>
+        <path d="M30 62L52 20" stroke="#f7a823" stroke-width="6" stroke-linecap="round"/>
+        <path d="M44 30L66 66M66 30L44 66" stroke="#0a8fd8" stroke-width="7" stroke-linecap="round"/>
+        <path d="M36 74H54M40 81H50" stroke="#f7a823" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <div class="name">imagux</div>
+      <div class="tag">Creative Design &amp; Digital MKT</div>
+    </div>
+  </header>
+
+  <!-- INTRO -->
+  <section class="intro">
+    <div class="intro-text">
+      <h1>¡Bienvenido a <span>Imagux!</span></h1>
+      <h2>Tu secretario inteligente está a un paso de comenzar</h2>
+      <p>Gracias por confiar en nosotros. Hemos creado para ti un agente de inteligencia artificial que trabajará como tu secretario digital, automatizando tareas, gestionando mensajes y ayudándote a ahorrar tiempo y hacer crecer tu negocio.</p>
+    </div>
+    <svg class="robot" viewBox="0 0 220 230" fill="none">
+      <!-- teléfono -->
+      <g transform="rotate(12 165 150)">
+        <rect x="128" y="95" width="80" height="125" rx="14" fill="#0a8fd8" stroke="#0b5fa3" stroke-width="4"/>
+        <rect x="136" y="105" width="64" height="105" rx="8" fill="#e8f5fd"/>
+        <circle cx="168" cy="158" r="22" fill="#fff" stroke="#0a8fd8" stroke-width="5"/>
+        <path d="M158 168l3-9a14 14 0 1 1 7 7z" fill="#0a8fd8"/>
+      </g>
+      <!-- cuerpo -->
+      <ellipse cx="85" cy="185" rx="55" ry="38" fill="#eaf5fd" stroke="#bfe0f6" stroke-width="3"/>
+      <circle cx="90" cy="180" r="12" fill="#fff" stroke="#0a8fd8" stroke-width="2.5"/>
+      <path d="M84 188l12-18M88 170l8 18" stroke="#f7a823" stroke-width="3" stroke-linecap="round"/>
+      <!-- cabeza -->
+      <rect x="35" y="55" width="100" height="85" rx="38" fill="#fff" stroke="#bfe0f6" stroke-width="3"/>
+      <rect x="45" y="68" width="80" height="58" rx="26" fill="#10264a"/>
+      <path d="M65 98q8-12 16 0M92 98q8-12 16 0" stroke="#5fd0ff" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <path d="M78 112q10 8 20 0" stroke="#5fd0ff" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <!-- auriculares -->
+      <rect x="22" y="80" width="20" height="38" rx="9" fill="#0a8fd8"/>
+      <rect x="128" y="80" width="20" height="38" rx="9" fill="#0a8fd8"/>
+      <path d="M32 80Q32 45 85 45Q138 45 138 80" stroke="#0a8fd8" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M32 118Q40 138 70 138" stroke="#0a8fd8" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <!-- destellos -->
+      <path d="M185 60l-8-14M200 78l-14-6M205 102h-14" stroke="#f7a823" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+  </section>
+
+  <!-- PASOS -->
+  <section class="steps">
+
+    <!-- Paso 1 -->
+    <div class="step">
+      <div class="icon">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#0a8fd8" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 40l3-9A17 17 0 1 1 17 37z"/>
+          <path d="M18 17c0 8 6 14 14 14l2-4-5-2-2 2c-3-1-5-3-6-6l2-2-2-5z" fill="#0a8fd8" stroke="none"/>
+        </svg>
+      </div>
+      <div class="step-body">
+        <div class="step-title"><span class="num">01</span><span class="dot">·</span>Conecta tu WhatsApp</div>
+        <p>Escanea el código QR personalizado para vincular la cuenta de WhatsApp que utilizará tu secretario inteligente.</p>
       </div>
       <a class="qr-box" href="https://imagux-design-mi-node-app.i8yzuh.easypanel.host/qr" target="_blank" rel="noopener">
         <svg viewBox="0 0 64 64" fill="#0a6fc2">
@@ -126,52 +264,9 @@
         <p>Verificaremos la conexión para que tu asistente pueda empezar a trabajar.</p>
       </div>
     </div>
-  </section><p>Escanea el código QR personalizado para vincular la cuenta de WhatsApp que utilizará tu secretario inteligente.</p>
-      </div>
-      <a class="qr-box" href="https://imagux-design-mi-node-app.i8yzuh.easypanel.host/qr" target="_blank" rel="noopener">
-        <svg viewBox="0 0 64 64" fill="#0a6fc2">
-          <path d="M4 4h22v22H4zM10 10v10h10V10zM38 4h22v22H38zM44 10v10h10V10zM4 38h22v22H4zM10 44v10h10V44z"/>
-          <rect x="14" y="14" width="2" height="2"/><rect x="48" y="14" width="2" height="2"/><rect x="14" y="48" width="2" height="2"/>
-          <rect x="34" y="34" width="6" height="6"/><rect x="44" y="34" width="6" height="6"/><rect x="54" y="38" width="6" height="6"/>
-          <rect x="34" y="46" width="6" height="6"/><rect x="48" y="48" width="6" height="6"/><rect x="38" y="56" width="6" height="4"/><rect x="54" y="54" width="6" height="6"/>
-        </svg>
-        <strong>ESCANEAR CÓDIGO QR</strong>
-        <small>Se abrirá en una nueva pestaña</small>
-        <span class="qr-btn">ABRIR QR →</span>
-      </a>
-    </div>
+  </section>
 
-    <!-- Paso 2 -->
-    <div class="step">
-      <div class="icon">
-        <svg viewBox="0 0 48 48" fill="none" stroke="#0a8fd8" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M24 5l15 5v12c0 10-6.500 17-15 21C15.500 39 9 32 9 22V10z"/>
-          <path d="M17 24l5 5 9-10"/>
-        </svg>
-      </div>
-      <div class="step-body">
-        <div class="step-title"><span class="num">02</span><span class="dot">·</span>Autoriza la conexión</div>
-        <p>Abre el enlace seguro y concede los permisos necesarios para activar la integración.</p>
-        <a class="btn" href="https://n8n.imaguxdesign.com/webhook/conectar_cliente?state=cliente001&amp;iss=https://accounts.google.com&amp;code=4/0AXlqoi4vyGHTknODA-XzbdUxWe7RzZrIARDyiiTnejjABlX6V2U7Rxo3VbaLbdKc3n5ikg&amp;scope=https://www.googleapis.com/auth/drive%20https://www.googleapis.com/auth/spreadsheets%20https://www.googleapis.com/auth/calendar%20https://www.googleapis.com/auth/gmail.modify" target="_blank" rel="noopener">
-          Autorizar conexión
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </a>
-      </div>
-    </div>
-
-    <!-- Paso 3 -->
-    <div class="step">
-      <div class="icon">
-        <svg viewBox="0 0 48 48" fill="#0a8fd8" stroke="#0a8fd8" stroke-width="2.5" stroke-linejoin="round">
-          <path d="M27 4L10 27h12l-3 17 19-25H26z"/>
-        </svg>
-      </div>
-      <div class="step-body">
-        <div class="step-title"><span class="num">03</span><span class="dot">·</span>Activa tu secretario de IA</div>
-        <p>Verificaremos la conexión para que tu asistente pueda empezar a trabajar.</p>
-      </div>
-    </div>
-  </section><!-- GRACIAS -->
+  <!-- GRACIAS -->
   <section class="thanks">
     <div class="heart">
       <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 21s-8-5.500-8-11a4.500 4.500 0 0 1 8-2.800A4.500 4.500 0 0 1 20 10c0 5.500-8 11-8 11z"/></svg>
