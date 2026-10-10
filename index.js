@@ -41,7 +41,7 @@ const evo = async (method, endpoint, body) => {
 const slug = (s) =>
   String(s || '')
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
@@ -60,7 +60,7 @@ const allowed = (ip) => {
   return true;
 };
 
-const page = (title, body) => <!DOCTYPE html>
+const page = (title, body) => `<!DOCTYPE html>
 <html lang="es"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -74,7 +74,7 @@ const page = (title, body) => <!DOCTYPE html>
   button,.btn{display:inline-block;background:#0a8fd8;color:#fff;border:0;border-radius:30px;padding:14px 32px;font-size:15px;font-weight:700;text-decoration:none;cursor:pointer;margin-top:12px}
   img{width:100%;max-width:300px;margin:12px 0}
   .hp{position:absolute;left:-9999px}
-</style></head><body><div class="box">${body}</div></body></html>;
+</style></head><body><div class="box">${body}</div></body></html>`;
 
 // --- Paginas estaticas (solo estas, no se expone el codigo del servidor) ---
 // Funcionan con y sin .html: /bienvenida y /bienvenida.html, etc.
@@ -97,16 +97,16 @@ app.get('/health', (req, res) => res.json({ ok: true }));
 
 // --- Enlace generico: formulario de alta ---
 app.get('/conectar', (req, res) => {
-res.send(
+  res.send(
     page(
       'Conecta tu WhatsApp',
-      <h1>Crea tu secretario inteligente</h1>
+      `<h1>Crea tu secretario inteligente</h1>
        <p>Escribe tu nombre o el de tu negocio para empezar.</p>
        <form method="POST" action="/conectar">
          <input name="nombre" placeholder="Nombre o negocio" required maxlength="60">
          <input class="hp" name="website" tabindex="-1" autocomplete="off">
          <button type="submit">Continuar</button>
-       </form>
+       </form>`
     )
   );
 });
@@ -152,7 +152,7 @@ app.get('/whatsapp/:instance', (req, res) => {
   res.send(
     page(
       'Conecta tu WhatsApp',
-      <h1>Conecta tu WhatsApp</h1>
+      `<h1>Conecta tu WhatsApp</h1>
        <p>Abre WhatsApp, entra en Dispositivos vinculados, pulsa Vincular un dispositivo y escanea este codigo.</p>
        <div id="zona"><p>Generando codigo...</p></div>
        <script>
@@ -178,7 +178,7 @@ app.get('/whatsapp/:instance', (req, res) => {
          cargarQR();
          const t1 = setInterval(cargarQR, 25000);
          const t2 = setInterval(revisar, 3000);
-       </script>
+       </script>`
     )
   );
 });
@@ -198,11 +198,12 @@ app.get('/api/estado/:instance', async (req, res) => {
   if (!validInstance(req.params.instance)) return res.status(400).json({});
   try {
     const d = await evo('GET', '/instance/connectionState/' + req.params.instance);
-    res.json({ state: (d.instance && d.instance.state)  d.state  'unknown' });
+    res.json({ state: (d.instance && d.instance.state) || d.state || 'unknown' });
   } catch (err) {
     res.status(502).json({});
   }
 });
+
 // Paso Google: redirige a la pantalla de autorizacion con state = nombre de instancia
 app.get('/google/:instance', (req, res) => {
   const inst = req.params.instance;
