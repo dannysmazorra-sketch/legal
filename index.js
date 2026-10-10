@@ -1,66 +1,225 @@
 const express = require('express');
+const crypto = require('crypto');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
+app.use(express.urlencoded({ extended: false }));
+
 const PORT = process.env.PORT || 3000;
 
-// Se configuran en EasyPanel -> mi-node-app -> Entorno (no pongas claves en el codigo)
-const EVOLUTION_URL = (process.env.EVOLUTION_URL || '').replace(/\/$/, '');
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || '';
-const INSTANCE = process.env.EVOLUTION_INSTANCE || 'cliente001';
+// --- Variables de entorno (EasyPanel -> mi-node-app -> Entorno) ---
+const EVO_URL = (process.env.EVOLUTION_URL || '').replace(/\/$/, '');
+const EVO_KEY = process.env.EVOLUTION_API_KEY || '';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const GOOGLE_REDIRECT_URI =
+  process.env.GOOGLE_REDIRECT_URI || 'https://n8n.imaguxdesign.com/webhook/conectar_cliente';
+const N8N_NEW_CLIENT_WEBHOOK = process.env.N8N_NEW_CLIENT_WEBHOOK || ''; // opcional
+const SCOPES = [
+  'https://www.googleapis.com/auth/drive',
+  'https://www.googleapis.com/auth/spreadsheets',
+  'https://www.googleapis.com/auth/calendar',
+  'https://www.googleapis.com/auth/gmail.modify',
+].join(' ');
 
-// Paginas estaticas (solo estos archivos, no se expone el codigo del servidor)
-const sendPage = (file) => (req, res) => res.sendFile(path.join(__dirname, file));
-app.get('/', (req, res) => res.redirect('/bienvenida'));
-app.get('/bienvenida', sendPage('bienvenida.html'));
-app.get('/privacidad', sendPage('privacidad.html'));
-app.get('/terminos', sendPage('terminos.html'));
+// --- Utilidades ---
+const evo = async (method, endpoint, body) => {
+  const r = await fetch(EVO_URL + endpoint, {
+    method,
+    headers: { apikey: EVO_KEY, 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const err = new Error('Evolution API ' + r.status);
+    err.data = data;
+    throw err;
+  }
+  return data;
+};
 
-// Comprobacion rapida de que la app esta viva
-app.get('/health', (req, res) => res.json({ ok: true }));
+const slug = (s) =>
+  String(s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 30) || 'cliente';
 
-// Plantilla simple para la pagina del QR
-const qrPage = (body) => <!DOCTYPE html>
+const validInstance = (n) => /^[a-z0-9-]{3,60}$/.test(n || '');
+
+// Limite simple: 5 instancias por IP por hora
+const hits = new Map();
+const allowed = (ip) => {
+  const now = Date.now();
+  const list = (hits.get(ip) || []).filter((t) => now - t < 3600 * 1000);
+  if (list.length >= 5) return false;
+  list.push(now);
+  hits.set(ip, list);
+  return true;
+};
+
+const page = (title, body) => <!DOCTYPE html>
 <html lang="es"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="refresh" content="25">
-<title>Conecta tu WhatsApp - Imagux</title>
+<title>${title} - Imagux</title>
 <style>
   body{font-family:Arial,sans-serif;background:#eaf4fc;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;padding:16px}
-  .box{background:#fff;border-radius:20px;padding:32px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(10,100,180,.15)}
+  .box{background:#fff;border-radius:20px;padding:32px;max-width:440px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(10,100,180,.15)}
   h1{color:#0f2a52;font-size:22px;margin:0 0 8px}
   p{color:#44566f;font-size:15px;line-height:1.5}
-  img{width:100%;max-width:300px;margin:16px 0}
-</style></head>
-<body><div class="box">${body}</div></body></html>;
+  input{width:100%;box-sizing:border-box;padding:14px;margin:8px 0;border:1px solid #cfe3f3;border-radius:10px;font-size:16px}
+  button,.btn{display:inline-block;background:#0a8fd8;color:#fff;border:0;border-radius:30px;padding:14px 32px;font-size:15px;font-weight:700;text-decoration:none;cursor:pointer;margin-top:12px}
+  img{width:100%;max-width:300px;margin:12px 0}
+  .hp{position:absolute;left:-9999px}
+</style></head><body><div class="box">${body}</div></body></html>;
 
-// Muestra el QR de Evolution API
-app.get('/qr', async (req, res) => {
+// --- Paginas estaticas (solo estas, no se expone el codigo del servidor) ---
+// Funcionan con y sin .html: /bienvenida y /bienvenida.html, etc.
+const PAGINAS = ['bienvenida', 'privacidad', 'terminos'];
+PAGINAS.forEach((nombre) => {
+  const archivo = path.join(__dirname, nombre + '.html');
+  const enviar = (req, res) => res.sendFile(archivo);
+  app.get('/' + nombre, enviar);
+  app.get('/' + nombre + '.html', enviar);
+});
+
+// Raiz: si existe index.html lo muestra, si no lleva a la bienvenida
+app.get(['/', '/index.html'], (req, res) => {
+  const idx = path.join(__dirname, 'index.html');
+  if (fs.existsSync(idx)) return res.sendFile(idx);
+  res.redirect('/bienvenida');
+});
+
+app.get('/health', (req, res) => res.json({ ok: true }));
+
+// --- Enlace generico: formulario de alta ---
+app.get('/conectar', (req, res) => {
+res.send(
+    page(
+      'Conecta tu WhatsApp',
+      <h1>Crea tu secretario inteligente</h1>
+       <p>Escribe tu nombre o el de tu negocio para empezar.</p>
+       <form method="POST" action="/conectar">
+         <input name="nombre" placeholder="Nombre o negocio" required maxlength="60">
+         <input class="hp" name="website" tabindex="-1" autocomplete="off">
+         <button type="submit">Continuar</button>
+       </form>
+    )
+  );
+});
+
+// Crea la instancia en Evolution API y redirige al QR
+app.post('/conectar', async (req, res) => {
   try {
-    const r = await fetch(${EVOLUTION_URL}/instance/connect/${INSTANCE}, {
-      headers: { apikey: EVOLUTION_API_KEY },
+    if (req.body.website) return res.status(400).send('Solicitud no valida');
+    if (!allowed(req.ip)) {
+      return res.status(429).send(page('Demasiados intentos', '<h1>Demasiados intentos</h1><p>Intentalo de nuevo mas tarde.</p>'));
+    }
+    const nombre = String(req.body.nombre || '').trim().slice(0, 60);
+    if (!nombre) return res.redirect('/conectar');
+
+    const instanceName = slug(nombre) + '-' + crypto.randomBytes(4).toString('hex');
+
+    await evo('POST', '/instance/create', {
+      instanceName,
+      qrcode: true,
+      integration: 'WHATSAPP-BAILEYS',
     });
-    const data = await r.json();
 
-    if (!r.ok) {
-      console.error('Evolution API error:', data);
-      return res.status(502).send(qrPage('<h1>No se pudo generar el QR</h1><p>Intentalo de nuevo en unos segundos.</p>'));
+    // Aviso opcional a n8n para registrar al cliente
+    if (N8N_NEW_CLIENT_WEBHOOK) {
+      fetch(N8N_NEW_CLIENT_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ instanceName, nombre }),
+      }).catch((e) => console.error('n8n webhook:', e.message));
     }
 
-    if (!data.base64) {
-      return res.send(qrPage('<h1>Sin QR disponible</h1><p>Es posible que tu WhatsApp ya este conectado. Si no, recarga la pagina.</p>'));
-    }
-
-    res.send(qrPage(
-      <h1>Conecta tu WhatsApp</h1>
-      <p>Abre WhatsApp, entra en Dispositivos vinculados, pulsa Vincular un dispositivo y escanea este codigo.</p>
-      <img src="${data.base64}" alt="Codigo QR de WhatsApp">
-      <p><small>El codigo se actualiza solo cada 25 segundos.</small></p>));
+    res.redirect('/whatsapp/' + instanceName);
   } catch (err) {
-    console.error(err);
-    res.status(500).send(qrPage('<h1>Error del servidor</h1><p>Intentalo de nuevo mas tarde.</p>'));
+    console.error('Crear instancia:', err.message, err.data || '');
+    res.status(502).send(page('Error', '<h1>No se pudo crear tu conexion</h1><p>Intentalo de nuevo en unos segundos.</p>'));
   }
 });
+
+// Pagina del QR (se actualiza sola y detecta cuando WhatsApp queda conectado)
+app.get('/whatsapp/:instance', (req, res) => {
+  const inst = req.params.instance;
+  if (!validInstance(inst)) return res.status(400).send('Solicitud no valida');
+  res.send(
+    page(
+      'Conecta tu WhatsApp',
+      <h1>Conecta tu WhatsApp</h1>
+       <p>Abre WhatsApp, entra en Dispositivos vinculados, pulsa Vincular un dispositivo y escanea este codigo.</p>
+       <div id="zona"><p>Generando codigo...</p></div>
+       <script>
+         const inst = ${JSON.stringify(inst)};
+         const zona = document.getElementById('zona');
+         async function cargarQR(){
+           try{
+             const r = await fetch('/api/qr/' + inst);
+             const d = await r.json();
+             if(d.base64){ zona.innerHTML = '<img src="'+d.base64+'" alt="QR de WhatsApp"><p><small>Se actualiza solo.</small></p>'; }
+           }catch(e){}
+         }
+         async function revisar(){
+           try{
+             const r = await fetch('/api/estado/' + inst);
+             const d = await r.json();
+             if(d.state === 'open'){
+               clearInterval(t1); clearInterval(t2);
+               zona.innerHTML = '<h1>WhatsApp conectado</h1><p>Ultimo paso: autoriza el acceso a tu cuenta de Google.</p><a class="btn" href="/google/'+inst+'">Autorizar Google</a>';
+             }
+           }catch(e){}
+         }
+         cargarQR();
+         const t1 = setInterval(cargarQR, 25000);
+         const t2 = setInterval(revisar, 3000);
+       </script>
+    )
+  );
+});
+
+app.get('/api/qr/:instance', async (req, res) => {
+  if (!validInstance(req.params.instance)) return res.status(400).json({});
+  try {
+    const d = await evo('GET', '/instance/connect/' + req.params.instance);
+    res.json({ base64: d.base64 || null });
+  } catch (err) {
+    console.error('QR:', err.message, err.data || '');
+    res.status(502).json({});
+  }
+});
+
+app.get('/api/estado/:instance', async (req, res) => {
+  if (!validInstance(req.params.instance)) return res.status(400).json({});
+  try {
+    const d = await evo('GET', '/instance/connectionState/' + req.params.instance);
+    res.json({ state: (d.instance && d.instance.state)  d.state  'unknown' });
+  } catch (err) {
+    res.status(502).json({});
+  }
+});
+// Paso Google: redirige a la pantalla de autorizacion con state = nombre de instancia
+app.get('/google/:instance', (req, res) => {
+  const inst = req.params.instance;
+  if (!validInstance(inst) || !GOOGLE_CLIENT_ID) return res.status(400).send('Solicitud no valida');
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: GOOGLE_REDIRECT_URI,
+    response_type: 'code',
+    scope: SCOPES,
+    access_type: 'offline',
+    prompt: 'consent',
+    state: inst,
+  });
+  res.redirect('https://accounts.google.com/o/oauth2/v2/auth?' + params.toString());
+});
+
+// Compatibilidad con el enlace anterior
+app.get('/qr', (req, res) => res.redirect('/conectar'));
 
 app.listen(PORT, () => console.log('Servidor ejecutandose en el puerto ' + PORT));
