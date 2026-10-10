@@ -222,5 +222,7 @@ app.get('/google/:instance', (req, res) => {
 
 // Compatibilidad con el enlace anterior
 app.get('/qr', (req, res) => res.redirect('/conectar'));
-
+app.get('/photo_5357381075497330302_y.jpg', (req, res) => {
+  res.sendFile(path.join(__dirname, 'photo_5357381075497330302_y.jpg'));
+});
 app.listen(PORT, () => console.log('Servidor ejecutandose en el puerto ' + PORT));
