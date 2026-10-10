@@ -1,126 +1,134 @@
-/* Tarjeta de Paso */
-        .step-card {
-            background: #ffffff;
-            border: 1px solid #e1eef9;
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 12px rgba(0, 43, 92, 0.03);
-            gap: 20px;
-        }
-        .step-left {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            flex: 1;
-        }
-        .step-icon-bg {
-            width: 44px;
-            height: 44px;
-            background: #e8f4fc;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0099ff;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        .step-title {
-            color: #002b5c;
-            font-size: 16px;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-        .step-title span {
-            color: #ffb703;
-            margin-right: 4px;
-        }
-        .step-desc {
-            color: #5a6e85;
-            font-size: 12.5px;
-            line-height: 1.4;
-        }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#eaf8ff">
 
-        /* Botón QR (Paso 1) */
-        .btn-qr-box {
-            border: 2px dashed #0099ff;
-            background: #f4f9fe;
-            border-radius: 12px;
-            padding: 12px 16px;
-            text-align: center;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-width: 170px;
-            transition: all 0.2s ease;
-        }
-        .btn-qr-box:hover {
-            background: #e8f4fc;
-            transform: translateY(-2px);
-        }
-        .qr-icon {
-            color: #0099ff;
-            font-size: 26px;
-            margin-bottom: 4px;
-        }
-        .qr-text-main {
-            color: #002b5c;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.3px;
-        }
-        .qr-text-sub {
-            color: #0099ff;
-            font-size: 9px;
-            margin-top: 2px;
-        }
+  <title>Bienvenido a Imagux</title>
 
-        /* Botón Azul (Paso 2) */
-        .btn-action-blue {
-            background: #0099ff;
-            color: #ffffff !important;
-            text-decoration: none;
-            font-weight: 800;
-            font-size: 12px;
-            padding: 12px 22px;
-            border-radius: 25px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0, 153, 255, 0.3);
-            white-space: nowrap;
-            transition: all 0.2s ease;
-        }
-        .btn-action-blue:hover {
-            background: #0080d7;
-            transform: translateY(-2px);
-        }
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        /* Caja de Agradecimiento */
-        .thank-box {
-            background: #f4f9fe;
-            border-radius: 16px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .thank-icon {
-            width: 36px;
-            height: 36px;
-            background: #ffb703;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-        .thank-text h4 {
-            color: #002b5c;
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #eaf8ff;
+      color: #173553;
+      line-height: 1.6;
+      padding: 28px 14px;
+    }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(28, 117, 166, 0.18);
+      border: 1px solid #d8effb;
+    }
+
+    .header {
+      position: relative;
+      text-align: center;
+      padding: 28px 20px 25px;
+      background: linear-gradient(135deg, #e4f7ff, #ffffff, #dff4ff);
+      border-bottom: 1px solid #e2f2fa;
+    }
+
+    .logo-icon {
+      font-size: 47px;
+      font-weight: 900;
+      color: #079fcb;
+      line-height: 1.1;
+    }
+
+    .logo {
+      color: #079bc5;
+      font-size: 39px;
+      font-weight: 400;
+      letter-spacing: -1.5px;
+      line-height: 1.15;
+    }
+
+    .tagline {
+      color: #e8a32a;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.4px;
+    }
+
+    .content {
+      padding: 25px 25px 18px;
+    }
+
+    h1 {
+      font-size: clamp(27px, 5vw, 36px);
+      line-height: 1.2;
+      margin-bottom: 12px;
+      color: #173553;
+      letter-spacing: -1px;
+    }
+
+    h1 span {
+      color: #079fcb;
+    }
+
+    .subtitle {
+      font-size: 19px;
+      font-weight: bold;
+      line-height: 1.4;
+      color: #405b76;
+      margin-bottom: 14px;
+    }
+
+    .intro {
+      font-size: 14px;
+      color: #53677b;
+      margin-bottom: 25px;
+    }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 22px 18px;
+      margin-bottom: 14px;
+      border: 1px solid #e7f2f8;
+      border-radius: 17px;
+      background: linear-gradient(120deg, #ffffff, #fbfeff);
+      box-shadow: 0 5px 15px rgba(39, 118, 157, 0.07);
+    }
+
+    .step-icon {
+      flex: 0 0 55px;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: #e1f5ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 27px;
+      margin-top: 3px;
+    }
+
+    .step-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .step-title {
+      font-size: 20px;
+      line-height: 1.35;
+      margin-bottom: 10px;
+      color: #173553;
+      font-weight: 800;
+    }
+
+    .number {
+      color: #f2a
