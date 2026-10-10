@@ -222,5 +222,5 @@ app.get('/google/:instance', (req, res) => {
 
 // Compatibilidad con el enlace anterior
 app.get('/qr', (req, res) => res.redirect('/conectar'));
-
+<link rel="icon" type="image/jpeg" href="/photo_5357381075497330302_y.jpg">
 app.listen(PORT, () => console.log('Servidor ejecutandose en el puerto ' + PORT));
