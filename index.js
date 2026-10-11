@@ -2,12 +2,12 @@ const express = require('express');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
-
+ 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
-
+ 
 const PORT = process.env.PORT || 3000;
-
+ 
 // --- Variables de entorno (EasyPanel -> mi-node-app -> Entorno) ---
 const EVO_URL = (process.env.EVOLUTION_URL || '').replace(/\/$/, '');
 const EVO_KEY = process.env.EVOLUTION_API_KEY || '';
@@ -21,7 +21,7 @@ const SCOPES = [
   'https://www.googleapis.com/auth/calendar',
   'https://www.googleapis.com/auth/gmail.modify',
 ].join(' ');
-
+ 
 // --- Utilidades ---
 const evo = async (method, endpoint, body) => {
   const r = await fetch(EVO_URL + endpoint, {
@@ -37,7 +37,7 @@ const evo = async (method, endpoint, body) => {
   }
   return data;
 };
-
+ 
 const slug = (s) =>
   String(s || '')
     .normalize('NFD')
@@ -46,9 +46,9 @@ const slug = (s) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 30) || 'cliente';
-
+ 
 const validInstance = (n) => /^[a-z0-9-]{3,60}$/.test(n || '');
-
+ 
 // Limite simple: 5 instancias por IP por hora
 const hits = new Map();
 const allowed = (ip) => {
@@ -59,7 +59,7 @@ const allowed = (ip) => {
   hits.set(ip, list);
   return true;
 };
-
+ 
 const page = (title, body) => `<!DOCTYPE html>
 <html lang="es"><head>
 <meta charset="UTF-8">
@@ -75,7 +75,7 @@ const page = (title, body) => `<!DOCTYPE html>
   img{width:100%;max-width:300px;margin:12px 0}
   .hp{position:absolute;left:-9999px}
 </style></head><body><div class="box">${body}</div></body></html>`;
-
+ 
 // --- Paginas estaticas (solo estas, no se expone el codigo del servidor) ---
 // Funcionan con y sin .html: /bienvenida y /bienvenida.html, etc.
 const PAGINAS = ['bienvenida', 'privacidad', 'terminos'];
@@ -85,16 +85,16 @@ PAGINAS.forEach((nombre) => {
   app.get('/' + nombre, enviar);
   app.get('/' + nombre + '.html', enviar);
 });
-
+ 
 // Raiz: si existe index.html lo muestra, si no lleva a la bienvenida
 app.get(['/', '/index.html'], (req, res) => {
   const idx = path.join(__dirname, 'index.html');
   if (fs.existsSync(idx)) return res.sendFile(idx);
   res.redirect('/bienvenida');
 });
-
+ 
 app.get('/health', (req, res) => res.json({ ok: true }));
-
+ 
 // --- Enlace generico: formulario de alta ---
 app.get('/conectar', (req, res) => {
   res.send(
@@ -110,7 +110,7 @@ app.get('/conectar', (req, res) => {
     )
   );
 });
-
+ 
 // Crea la instancia en Evolution API y redirige al QR
 app.post('/conectar', async (req, res) => {
   try {
@@ -120,15 +120,15 @@ app.post('/conectar', async (req, res) => {
     }
     const nombre = String(req.body.nombre || '').trim().slice(0, 60);
     if (!nombre) return res.redirect('/conectar');
-
+ 
     const instanceName = slug(nombre) + '-' + crypto.randomBytes(4).toString('hex');
-
+ 
     await evo('POST', '/instance/create', {
       instanceName,
       qrcode: true,
       integration: 'WHATSAPP-BAILEYS',
     });
-
+ 
     // Aviso opcional a n8n para registrar al cliente
     if (N8N_NEW_CLIENT_WEBHOOK) {
       fetch(N8N_NEW_CLIENT_WEBHOOK, {
@@ -137,14 +137,14 @@ app.post('/conectar', async (req, res) => {
         body: JSON.stringify({ instanceName, nombre }),
       }).catch((e) => console.error('n8n webhook:', e.message));
     }
-
+ 
     res.redirect('/whatsapp/' + instanceName);
   } catch (err) {
     console.error('Crear instancia:', err.message, err.data || '');
     res.status(502).send(page('Error', '<h1>No se pudo crear tu conexion</h1><p>Intentalo de nuevo en unos segundos.</p>'));
   }
 });
-
+ 
 // Pagina del QR (se actualiza sola y detecta cuando WhatsApp queda conectado)
 app.get('/whatsapp/:instance', (req, res) => {
   const inst = req.params.instance;
@@ -171,7 +171,7 @@ app.get('/whatsapp/:instance', (req, res) => {
              const d = await r.json();
              if(d.state === 'open'){
                clearInterval(t1); clearInterval(t2);
-               zona.innerHTML = '<h1>WhatsApp conectado</h1><p>Ultimo paso: autoriza el acceso a tu cuenta de Google.</p><a class="btn" href="/google/'+inst+'">Autorizar Google</a>';
+               zona.innerHTML = '<h1>WhatsApp conectado</h1><p>Ultimo paso: autoriza el acceso a tu cuenta de Google.</p><a class="btn" href="https://accounts.google.com/o/oauth2/v2/auth?client_id=257879636064-qfirng5upcv8upisotln88gmucuqdsrk.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fn8n.imaguxdesign.com%2Fwebhook-test%2Fconectar_cliente&response_type=code&access_type=offline&prompt=consent&state=cliente001&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fspreadsheets%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.modify%20openid%20email%20profile">Autorizar Google</a>';
              }
            }catch(e){}
          }
@@ -182,7 +182,7 @@ app.get('/whatsapp/:instance', (req, res) => {
     )
   );
 });
-
+ 
 app.get('/api/qr/:instance', async (req, res) => {
   if (!validInstance(req.params.instance)) return res.status(400).json({});
   try {
@@ -193,7 +193,7 @@ app.get('/api/qr/:instance', async (req, res) => {
     res.status(502).json({});
   }
 });
-
+ 
 app.get('/api/estado/:instance', async (req, res) => {
   if (!validInstance(req.params.instance)) return res.status(400).json({});
   try {
@@ -203,7 +203,7 @@ app.get('/api/estado/:instance', async (req, res) => {
     res.status(502).json({});
   }
 });
-
+ 
 // Paso Google: redirige a la pantalla de autorizacion con state = nombre de instancia
 app.get('/google/:instance', (req, res) => {
   const inst = req.params.instance;
@@ -219,7 +219,7 @@ app.get('/google/:instance', (req, res) => {
   });
   res.redirect('https://accounts.google.com/o/oauth2/v2/auth?' + params.toString());
 });
-
+ 
 // Compatibilidad con el enlace anterior
 app.get('/qr', (req, res) => res.redirect('/conectar'));
 app.get('/photo_5357381075497330302_y.jpg', (req, res) => {
